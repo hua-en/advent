@@ -1,10 +1,10 @@
-use std::fs::read_to_string;
 use std::collections::HashMap;
+use std::fs::read_to_string;
 
 use regex::Regex;
 
 fn main() {
-    let tot_val = naive_count("input.txt");
+    let tot_val = number_count("input.txt");
     let tot_val_2 = number_and_word_count("input.txt");
     println!("First Part: {}", tot_val);
     println!("Second Part: {}", tot_val_2);
@@ -39,6 +39,33 @@ fn naive_count(path: &str) -> i32 {
     tot_val
 }
 
+fn number_count(path: &str) -> i32 {
+    let numreg = Regex::new(r"\d").expect("Regex failed to create");
+
+    let fullstr = read_to_string(path).expect("Cannot read from file");
+    let lines = fullstr.lines();
+
+    // Find the value in each line
+    let tot_val = lines
+        .map(|line| {
+            // Look for first and last character
+            let all_matches: Vec<_> = numreg
+                .find_iter(line)
+                .map(|m| m.as_str().chars().next().expect("string is empty"))
+                .collect();
+            let fst = all_matches[0];
+            let lst = all_matches[all_matches.len() - 1];
+
+            // Combine them together and add
+            format!("{}{}", fst, lst)
+                .parse::<i32>()
+                .expect("fst or lst is not a digit")
+        })
+        .sum(); // Sum up values in all lines
+
+    tot_val
+}
+
 fn number_and_word_count(path: &str) -> i32 {
     let numstr_to_num = HashMap::from([
         ("one".to_string(), '1'),
@@ -49,32 +76,41 @@ fn number_and_word_count(path: &str) -> i32 {
         ("six".to_string(), '6'),
         ("seven".to_string(), '7'),
         ("eight".to_string(), '8'),
-        ("nine".to_string(), '9')
+        ("nine".to_string(), '9'),
     ]);
 
     // Approach: Use regex to find the numbers in the string, then get the first and last number
-    let numletreg = Regex::new(r"one|two|three|four|five|six|seven|eight|nine|\d").expect("Regex failed to create");
+    let numletreg = Regex::new(r"one|two|three|four|five|six|seven|eight|nine|\d")
+        .expect("Regex failed to create");
 
-    let fullstr = read_to_string(path).expect("Cannot read from file!");
+    let fullstr = read_to_string(path).expect("Cannot read from file");
     let lines = fullstr.lines();
-    
-    // Find the value in each line
-    let tot_val = lines.map(|line| {
-        // Look for first character
-        let fst = convert_to_digit(numletreg.find(line).expect("No numbers in line").as_str(), &numstr_to_num);
-        
-        // Look for last character
-        let line_len = line.len();
-        let lst = (0..line_len).rev()
-        .find_map(|i| {
-            let x = numletreg.find(&line[i..])?;
-            Some(convert_to_digit(x.as_str(), &numstr_to_num))
-        })
-        .expect("nothing found: panicking");
 
-        // Combine them together and add
-        format!("{}{}", fst, lst).parse::<i32>().expect("fst or lst is not a digit")
-    }).sum(); // Sum up values in all lines
+    // Find the value in each line
+    let tot_val = lines
+        .map(|line| {
+            // Look for first character
+            let fst = convert_to_digit(
+                numletreg.find(line).expect("No numbers in line").as_str(),
+                &numstr_to_num,
+            );
+
+            // Look for last character
+            let line_len = line.len();
+            let lst = (0..line_len)
+                .rev()
+                .find_map(|i| {
+                    let x = numletreg.find(&line[i..])?;
+                    Some(convert_to_digit(x.as_str(), &numstr_to_num))
+                })
+                .expect("nothing found: panicking");
+
+            // Combine them together and add
+            format!("{}{}", fst, lst)
+                .parse::<i32>()
+                .expect("fst or lst is not a digit")
+        })
+        .sum(); // Sum up values in all lines
 
     tot_val
 }
