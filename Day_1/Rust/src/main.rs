@@ -57,8 +57,10 @@ fn number_and_word_count(path: &str) -> i32 {
 
     let fullstr = read_to_string(path).unwrap();
     let lines = fullstr.lines();
-
+    
+    // Find the value in each line
     let tot_val = lines.map(|line| {
+        // Look for first character
         let fst = convert_to_digit(numletreg.find(line).unwrap().as_str(), &numstr_to_num);
         
         // Look for last character
@@ -72,7 +74,7 @@ fn number_and_word_count(path: &str) -> i32 {
 
         // Combine them together and add
         format!("{}{}", fst, lst).parse::<i32>().unwrap()
-    }).sum();
+    }).sum(); // Sum up values in all lines
 
     tot_val
 }
