@@ -63,17 +63,14 @@ fn number_and_word_count(path: &str) -> i32 {
         let fst = convert_to_digit(numletreg.find(line).unwrap().as_str(), &numstr_to_num);
         
         // Look for last character
-        let mut lst = ' ';
         let line_len = line.len();
-        for i in (0..line_len).rev() {
-            match numletreg.find(&line[i..line_len]) {
-                None => continue,
-                Some(x) => {
-                    lst = convert_to_digit(x.as_str(), &numstr_to_num);
-                    break;
-                },
-            }
-        };
+        let lst = (0..line_len).rev()
+        .find_map(|i| {
+            let x = numletreg.find(&line[i..])?;
+            Some(convert_to_digit(x.as_str(), &numstr_to_num))
+        })
+        .expect("nothing found: panicking");
+
         // Combine them together and add
         let fin_val = format!("{}{}", fst, lst).parse::<i32>().unwrap();
         tot_val += fin_val;
