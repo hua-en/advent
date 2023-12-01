@@ -53,15 +53,15 @@ fn number_and_word_count(path: &str) -> i32 {
     ]);
 
     // Approach: Use regex to find the numbers in the string, then get the first and last number
-    let numletreg = Regex::new(r"one|two|three|four|five|six|seven|eight|nine|\d").unwrap();
+    let numletreg = Regex::new(r"one|two|three|four|five|six|seven|eight|nine|\d").expect("Regex failed to create");
 
-    let fullstr = read_to_string(path).unwrap();
+    let fullstr = read_to_string(path).expect("Cannot read from file!");
     let lines = fullstr.lines();
     
     // Find the value in each line
     let tot_val = lines.map(|line| {
         // Look for first character
-        let fst = convert_to_digit(numletreg.find(line).unwrap().as_str(), &numstr_to_num);
+        let fst = convert_to_digit(numletreg.find(line).expect("No numbers in line").as_str(), &numstr_to_num);
         
         // Look for last character
         let line_len = line.len();
@@ -73,7 +73,7 @@ fn number_and_word_count(path: &str) -> i32 {
         .expect("nothing found: panicking");
 
         // Combine them together and add
-        format!("{}{}", fst, lst).parse::<i32>().unwrap()
+        format!("{}{}", fst, lst).parse::<i32>().expect("fst or lst is not a digit")
     }).sum(); // Sum up values in all lines
 
     tot_val
@@ -83,6 +83,6 @@ fn convert_to_digit(pos_str: &str, map: &HashMap<String, char>) -> char {
     if pos_str.len() > 1 {
         map[pos_str]
     } else {
-        pos_str.chars().next().unwrap()
+        pos_str.chars().next().expect("pos_str is empty")
     }
 }
