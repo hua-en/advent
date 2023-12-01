@@ -100,7 +100,7 @@ fn number_and_word_count(path: &str) -> i32 {
             let lst = (0..line_len)
                 .rev()
                 .find_map(|i| {
-                    let x = numletreg.find(&line[i..])?;
+                    let x = numletreg.find_at(line, i)?;
                     Some(convert_to_digit(x.as_str(), &numstr_to_num))
                 })
                 .expect("nothing found: panicking");
