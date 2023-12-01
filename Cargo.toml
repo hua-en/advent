@@ -1,5 +1,5 @@
 [workspace]
 
 members = [
-    "Day_1/Rust"
+    "day1/rust"
 ]
