@@ -58,8 +58,7 @@ fn number_and_word_count(path: &str) -> i32 {
     let fullstr = read_to_string(path).unwrap();
     let lines = fullstr.lines();
 
-    let mut tot_val = 0;
-    for line in lines {
+    let tot_val = lines.map(|line| {
         let fst = convert_to_digit(numletreg.find(line).unwrap().as_str(), &numstr_to_num);
         
         // Look for last character
@@ -72,9 +71,8 @@ fn number_and_word_count(path: &str) -> i32 {
         .expect("nothing found: panicking");
 
         // Combine them together and add
-        let fin_val = format!("{}{}", fst, lst).parse::<i32>().unwrap();
-        tot_val += fin_val;
-    }
+        format!("{}{}", fst, lst).parse::<i32>().unwrap()
+    }).sum();
 
     tot_val
 }
