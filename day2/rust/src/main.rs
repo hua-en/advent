@@ -27,12 +27,18 @@ fn main() {
     }
     let testoutput = sum_all_valid(&testinput, &bag);
     let testpowersum = powerset_sum_functional(&testinput);
-    println!("Test Output: {}, Test Powerset Sum: {}", testoutput, testpowersum);
+    println!(
+        "Test Output: {}, Test Powerset Sum: {}",
+        testoutput, testpowersum
+    );
 
     let realinput = parse_input("input.txt");
     let realoutput = sum_all_valid(&realinput, &bag);
     let realpowersum = powerset_sum_functional(&realinput);
-    println!("Real Output: {}, Real Powerset Sum: {}", realoutput, realpowersum);
+    println!(
+        "Real Output: {}, Real Powerset Sum: {}",
+        realoutput, realpowersum
+    );
 }
 
 fn parse_input(path: &str) -> Vec<GameData> {
@@ -115,30 +121,47 @@ fn min_value(game: &GameData) -> Play {
         }
     }
 
-    Play{red: min_red, green: min_green, blue: min_blue}
+    Play {
+        red: min_red,
+        green: min_green,
+        blue: min_blue,
+    }
 }
 
 fn powerset_sum(allgames: &[GameData]) -> i32 {
-    allgames.iter().map(|game| {
-        let play = min_value(game);
-        play.red * play.green * play.blue
-    }).sum()
+    allgames
+        .iter()
+        .map(|game| {
+            let play = min_value(game);
+            play.red * play.green * play.blue
+        })
+        .sum()
 }
 
 fn powerset_sum_functional(allgames: &[GameData]) -> i32 {
-    allgames.iter().map(|game| {
-        let play = game.games.iter().fold(Play {red: 0, green: 0, blue: 0},|mut acc, e| {
-            if acc.red < e.red {
-                acc.red = e.red;
-            }
-            if acc.green < e.green {
-                acc.green = e.green
-            }
-            if acc.blue < e.blue {
-                acc.blue = e.blue;
-            }
-            acc
-        });
-        play.red * play.green * play.blue
-    }).sum()
+    allgames
+        .iter()
+        .map(|game| {
+            let play = game.games.iter().fold(
+                Play {
+                    red: 0,
+                    green: 0,
+                    blue: 0,
+                },
+                |mut acc, e| {
+                    if acc.red < e.red {
+                        acc.red = e.red;
+                    }
+                    if acc.green < e.green {
+                        acc.green = e.green
+                    }
+                    if acc.blue < e.blue {
+                        acc.blue = e.blue;
+                    }
+                    acc
+                },
+            );
+            play.red * play.green * play.blue
+        })
+        .sum()
 }
