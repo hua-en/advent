@@ -4,8 +4,8 @@ use std::fs::read_to_string;
 use regex::Regex;
 
 fn main() {
-    let tot_val = number_count("input.txt");
-    let tot_val_2 = number_and_word_count("input.txt");
+    let tot_val = number_count("day1input.txt");
+    let tot_val_2 = number_and_word_count("day1input.txt");
     println!("First Part: {}", tot_val);
     println!("Second Part: {}", tot_val_2);
 }

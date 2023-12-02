@@ -21,7 +21,7 @@ fn main() {
         green: 13,
         blue: 14,
     };
-    let testinput = parse_input("test.txt");
+    let testinput = parse_input("day2test.txt");
     for i in &testinput {
         println!("{i:?}");
     }
@@ -32,7 +32,7 @@ fn main() {
         testoutput, testpowersum
     );
 
-    let realinput = parse_input("input.txt");
+    let realinput = parse_input("day2input.txt");
     let realoutput = sum_all_valid(&realinput, &bag);
     let realpowersum = powerset_sum_functional(&realinput);
     println!(

@@ -5,6 +5,6 @@ import qualified Data.Text.IO as T.IO
 
 main :: IO ()
 main = do
-    contents <- T.IO.readFile "test.txt"
+    contents <- T.IO.readFile "day1test.txt"
     let filelines = T.lines contents
     mapM_ T.IO.putStrLn filelines
