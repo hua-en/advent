@@ -4,14 +4,14 @@ use std::fs::read_to_string;
 use regex::Regex;
 
 fn main() {
-    let tot_val = number_count("day1input.txt");
-    let tot_val_2 = number_and_word_count("day1input.txt");
+    let input = read_to_string("day1input.txt").expect("Cannot read from file");
+    let tot_val = number_count(&input);
+    let tot_val_2 = number_and_word_count(&input);
     println!("First Part: {}", tot_val);
     println!("Second Part: {}", tot_val_2);
 }
 
-fn naive_count(path: &str) -> i32 {
-    let fullstr = read_to_string(path).unwrap();
+fn naive_count(fullstr: &str) -> i32 {
     let lines = fullstr.lines();
 
     let mut tot_val = 0;
@@ -39,10 +39,8 @@ fn naive_count(path: &str) -> i32 {
     tot_val
 }
 
-fn number_count(path: &str) -> i32 {
+fn number_count_regex(fullstr: &str) -> i32 {
     let numreg = Regex::new(r"\d").expect("Regex failed to create");
-
-    let fullstr = read_to_string(path).expect("Cannot read from file");
     let lines = fullstr.lines();
 
     // Find the value in each line
@@ -66,7 +64,22 @@ fn number_count(path: &str) -> i32 {
     tot_val
 }
 
-fn number_and_word_count(path: &str) -> i32 {
+fn number_count(fullstr: &str) -> i32 {
+    fullstr
+        .lines()
+        .map(|line| {
+            let mut digits = line.chars().filter(char::is_ascii_digit);
+            let fst = digits.next().expect("No values in line");
+            let lst = digits.last().unwrap_or(fst);
+
+            format!("{}{}", fst, lst)
+                .parse::<i32>()
+                .expect("fst or lst is not a digit")
+        })
+        .sum()
+}
+
+fn number_and_word_count(fullstr: &str) -> i32 {
     let numstr_to_num = HashMap::from([
         ("one".to_string(), '1'),
         ("two".to_string(), '2'),
@@ -83,7 +96,6 @@ fn number_and_word_count(path: &str) -> i32 {
     let numletreg = Regex::new(r"one|two|three|four|five|six|seven|eight|nine|\d")
         .expect("Regex failed to create");
 
-    let fullstr = read_to_string(path).expect("Cannot read from file");
     let lines = fullstr.lines();
 
     // Find the value in each line
