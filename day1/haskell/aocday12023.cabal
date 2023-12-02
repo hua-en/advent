@@ -1,0 +1,24 @@
+cabal-version:      3.0
+name:               aocday12023
+version:            0.1.0.0
+synopsis:           Haskell Solutions for AOC Day 1 2023
+description:        This is my Haskell solution for AOC day 1 2023.
+
+author:             hua-en
+maintainer:         huaen.lim@gmail.com
+-- bug-reports:
+-- homepage:
+
+license:            NONE
+-- A copyright notice.
+-- copyright:
+
+-- Extra files to be distributed with the package, such as examples or a README.
+extra-source-files: CHANGELOG.md
+
+executable aocday12023
+    main-is:          Main.hs
+    build-depends:    base >=4.17.2.0 && <5,
+    hs-source-dirs:   app
+    default-language: Haskell2010
+    ghc-options:      -Wall -fwarn-tabs
