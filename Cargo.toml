@@ -1,5 +1,9 @@
 [workspace]
 
 members = [
-    "day1/rust"
+    "day1/rust",
+    "day2/rust"
 ]
+
+[workspace.dependencies]
+regex = "1.10.2"
