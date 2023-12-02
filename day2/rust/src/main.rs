@@ -16,17 +16,23 @@ struct Play {
 }
 
 fn main() {
-    let bag = Play {red: 12, green: 13, blue: 14};
+    let bag = Play {
+        red: 12,
+        green: 13,
+        blue: 14,
+    };
     let testinput = parse_input("test.txt");
     for i in &testinput {
         println!("{i:?}");
     }
     let testoutput = sum_all_valid(&testinput, &bag);
-    println!("Test Output: {}", testoutput);
+    let testpowersum = powerset_sum(&testinput);
+    println!("Test Output: {}, Test Powerset Sum: {}", testoutput, testpowersum);
 
     let realinput = parse_input("input.txt");
     let realoutput = sum_all_valid(&realinput, &bag);
-    println!("Real Output: {}", realoutput);
+    let realpowersum = powerset_sum(&realinput);
+    println!("Real Output: {}, Real Powerset Sum: {}", realoutput, realpowersum);
 }
 
 fn parse_input(path: &str) -> Vec<GameData> {
@@ -52,23 +58,28 @@ fn parse_input(path: &str) -> Vec<GameData> {
                 .expect("Game id is not a digit");
 
             // Parse game data
-            let gamedata: Vec<_> = gameinfolst.map(|play| {
-                let red = match redreg.captures(play) {
-                    None => 0,
-                    Some(capt) => capt[1].parse::<i32>().expect("Red value is not a digit")
-                };
-                let green = match greenreg.captures(play) {
-                    None => 0,
-                    Some(capt) => capt[1].parse::<i32>().expect("Green value is not a digit")
-                };
-                let blue = match bluereg.captures(play) {
-                    None => 0,
-                    Some(capt) => capt[1].parse::<i32>().expect("Blue value is not a digit")
-                };
-                Play {red:red, green:green, blue:blue}
-            }).collect();
+            let gamedata: Vec<_> = gameinfolst
+                .map(|play| {
+                    let red = match redreg.captures(play) {
+                        None => 0,
+                        Some(capt) => capt[1].parse::<i32>().expect("Red value is not a digit"),
+                    };
+                    let green = match greenreg.captures(play) {
+                        None => 0,
+                        Some(capt) => capt[1].parse::<i32>().expect("Green value is not a digit"),
+                    };
+                    let blue = match bluereg.captures(play) {
+                        None => 0,
+                        Some(capt) => capt[1].parse::<i32>().expect("Blue value is not a digit"),
+                    };
+                    Play { red, green, blue }
+                })
+                .collect();
 
-            GameData {id: id, games: gamedata}
+            GameData {
+                id,
+                games: gamedata,
+            }
         })
         .collect()
 }
@@ -85,4 +96,32 @@ fn sum_all_valid(allgames: &[GameData], contents: &Play) -> i32 {
         .filter(|game| check_if_valid(game, contents))
         .map(|game| game.id)
         .sum()
+}
+
+// refactor this into a reduce
+fn min_value(game: &GameData) -> Play {
+    let mut min_red = 0;
+    let mut min_green = 0;
+    let mut min_blue = 0;
+
+    for play in &game.games {
+        if min_red < play.red {
+            min_red = play.red;
+        }
+        if min_green < play.green {
+            min_green = play.green;
+        }
+        if min_blue < play.blue {
+            min_blue = play.blue;
+        }
+    }
+
+    Play{red: min_red, green: min_green, blue: min_blue}
+}
+
+fn powerset_sum(allgames: &[GameData]) -> i32 {
+    allgames.iter().map(|game| {
+        let play = min_value(game);
+        play.red * play.green * play.blue
+    }).sum()
 }
