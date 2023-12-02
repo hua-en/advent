@@ -11,7 +11,7 @@ fn main() {
     println!("Second Part: {}", tot_val_2);
 }
 
-fn naive_count(fullstr: &str) -> i32 {
+fn number_count_imperative(fullstr: &str) -> i32 {
     let lines = fullstr.lines();
 
     let mut tot_val = 0;
