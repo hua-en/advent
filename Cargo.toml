@@ -2,7 +2,8 @@
 
 members = [
     "2023/day1/rust",
-    "2023/day2/rust"
+    "2023/day2/rust",
+    "2023/day4/rust"
 ]
 
 [workspace.dependencies]
