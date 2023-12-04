@@ -1,10 +1,11 @@
 [workspace]
-
 members = [
     "2023/day1/rust",
     "2023/day2/rust",
+    "2023/day3/rust",
     "2023/day4/rust"
 ]
+resolver = "2"
 
 [workspace.dependencies]
 regex = "1.10.2"
