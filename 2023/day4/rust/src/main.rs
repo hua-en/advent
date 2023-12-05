@@ -10,7 +10,8 @@ fn main() {
 }
 
 fn check_cards_1(fulltext: &str) -> i32 {
-    winners_per_card(fulltext).into_iter()
+    winners_per_card(fulltext)
+        .into_iter()
         .map(|v| calc_score(v.try_into().unwrap()))
         .sum()
 }
@@ -71,12 +72,15 @@ fn calc_score(score: u32) -> i32 {
 fn no_of_cards(winners: &[usize]) -> i32 {
     let card_cnt = winners.len();
     let mut win_per_card = Vec::from([0]);
-    for (i, j) in zip((0..card_cnt-1).rev(), 1..card_cnt) {
+    for (i, j) in zip((0..card_cnt - 1).rev(), 1..card_cnt) {
         let no_of_winners = winners[i];
-        let tot_winners = no_of_winners + win_per_card[(j-no_of_winners)..j].iter().sum::<usize>();
+        let tot_winners =
+            no_of_winners + win_per_card[(j - no_of_winners)..j].iter().sum::<usize>();
         win_per_card.push(tot_winners)
     }
-    (win_per_card.iter().sum::<usize>() + card_cnt).try_into().unwrap()
+    (win_per_card.iter().sum::<usize>() + card_cnt)
+        .try_into()
+        .expect("Casting of usize to i32 failed")
 }
 
 // Doesn't work because Rust doesn't allow you to access a list while it is being mutated

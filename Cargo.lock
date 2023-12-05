@@ -28,6 +28,9 @@ dependencies = [
 [[package]]
 name = "aoc_day_3_2023"
 version = "0.1.0"
+dependencies = [
+ "regex",
+]
 
 [[package]]
 name = "aoc_day_4_2023"
