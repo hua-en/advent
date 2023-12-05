@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 
+use ndarray::{prelude, s, Array2, ArrayBase, Data, Ix2};
 use regex::Regex;
-use ndarray::{prelude, Array2, ArrayBase, Data, Ix2};
 
 #[derive(Debug)]
 struct EngNumber {
@@ -11,14 +11,13 @@ struct EngNumber {
 }
 
 fn main() {
-    let testinput = read_to_string("day3test.txt").expect("Cannot read from file");
-    let all_numbers = find_all_numbers(&testinput);
+    let testinput = read_to_string("day3input.txt").expect("Cannot read from file");
     let txtgrid = convert_to_grid(&testinput);
-    println!("{}", testinput);
-    println!("{}", txtgrid);
-    for engpart in &all_numbers {
-        println!("{engpart:?}");
-    }
+    let all_numbers = find_all_numbers(&testinput);
+
+    let part_sum = sum_all_engine_numbers(&all_numbers, txtgrid.view());
+    println!("Sum of all parts: {}", part_sum);
+
 }
 
 fn find_all_numbers(fulltxt: &str) -> Vec<EngNumber> {
@@ -40,27 +39,68 @@ fn find_all_numbers(fulltxt: &str) -> Vec<EngNumber> {
         .collect()
 }
 
-fn check_number_surroundings<T: Data<Elem = char>>(no: &EngNumber, txtgrid: ArrayBase<T, Ix2>) -> bool {
-    // let x_start = if no.x_range.0 == 0 { 0 } else { no.x_range.0 - 1 };
-    // let x_end = if no.x_range.1 == dim.0 { dim.0 } else { no.x_range.1 + 1 };
-    // let mut lines = fulltxt.lines();
+fn check_number_surroundings<T: Data<Elem = char>>(
+    no: &EngNumber,
+    txtgrid: ArrayBase<T, Ix2>,
+) -> bool {
+    let (xdim, ydim) = txtgrid.dim();
+    let x_start = if no.x_range.0 == 0 {
+        0
+    } else {
+        no.x_range.0 - 1
+    };
+    let x_end = if no.x_range.1 == xdim {
+        xdim
+    } else {
+        no.x_range.1 + 1
+    };
 
-    // let mut all_iterators = Vec::new();
+    // Check top row
+    if no.y > 0
+        && txtgrid
+            .slice(s![no.y - 1, x_start..x_end])
+            .iter()
+            .any(|x| !(x.is_ascii_digit() || *x == '.'))
+    {
+        return true;
+    }
 
-    // if no.y > 0 {
-    //     all_iterators.push(lines.nth(no.y - 1).unwrap()[x_start..x_end].chars());
-    // }
+    // Check middle row
+    if no.x_range.0 > 0 {
+        let fstc = txtgrid[[no.y, no.x_range.0 - 1]];
+        if !(fstc.is_ascii_digit() || fstc == '.') {
+            return true;
+        }
+    }
 
-    // let middle = lines.next().unwrap();
-    // let middle_result = true;
+    if no.x_range.1 < xdim {
+        let lstc = txtgrid[[no.y, no.x_range.1]];
+        if !(lstc.is_ascii_digit() || lstc == '.') {
+            return true;
+        }
+    }
 
-    // if no.y < dim.1 {
-    //     all_iterators.push(lines.next().unwrap()[x_start..x_end].chars());
-    // }
+    // Check bottom row
+    if no.y < ydim - 1
+        && txtgrid
+            .slice(s![no.y + 1, x_start..x_end])
+            .iter()
+            .any(|x| !(x.is_ascii_digit() || *x == '.'))
+    {
+        return true;
+    }
+    false
+}
 
-    // let above_and_below_result = all_iterators.into_iter().flatten().any(|elem| true);
-    // middle_result || above_and_below_result
-    true
+fn sum_all_engine_numbers<T: Data<Elem = char>>(
+    numbers: &[EngNumber],
+    txtgrid: ArrayBase<T, Ix2>,
+) -> i32 {
+    numbers
+        .iter()
+        .filter(|no| check_number_surroundings(no, txtgrid.view()))
+        .map(|no| no.number)
+        .sum()
 }
 
 fn get_dim(fulltxt: &str) -> (usize, usize) {
@@ -71,5 +111,9 @@ fn get_dim(fulltxt: &str) -> (usize, usize) {
 }
 
 fn convert_to_grid(fulltxt: &str) -> Array2<char> {
-    ArrayBase::from_shape_vec(get_dim(fulltxt), fulltxt.lines().flat_map(|line| line.chars()).collect()).unwrap()
+    ArrayBase::from_shape_vec(
+        get_dim(fulltxt),
+        fulltxt.lines().flat_map(|line| line.chars()).collect(),
+    )
+    .unwrap()
 }
