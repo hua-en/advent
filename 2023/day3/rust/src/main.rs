@@ -1,7 +1,8 @@
 use std::fs::read_to_string;
 
-use ndarray::{prelude, s, Array2, ArrayBase, Data, Ix2};
+use ndarray::{s, Array2, ArrayBase, Data, Ix2};
 use regex::Regex;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 struct EngNumber {
@@ -16,7 +17,9 @@ fn main() {
     let all_numbers = find_all_numbers(&testinput);
 
     let part_sum = sum_all_engine_numbers(&all_numbers, txtgrid.view());
+    let gear_ratio = calculate_gear_ratio(&all_numbers, txtgrid.view());
     println!("Sum of all parts: {}", part_sum);
+    println!("Gear Ratio: {}", gear_ratio);
 
 }
 
@@ -116,4 +119,82 @@ fn convert_to_grid(fulltxt: &str) -> Array2<char> {
         fulltxt.lines().flat_map(|line| line.chars()).collect(),
     )
     .unwrap()
+}
+
+// Part 2:
+// Look through all numbers and their neighbouring gears
+// Cache them in a hashmap
+// Add up any hashmap entries with exactly 2 elements
+
+fn find_gears<T: Data<Elem = char>>(
+    no: &EngNumber,
+    txtgrid: ArrayBase<T, Ix2>,
+) -> Vec<(usize, usize)> {
+    let (xdim, ydim) = txtgrid.dim();
+    let x_start = if no.x_range.0 == 0 {
+        0
+    } else {
+        no.x_range.0 - 1
+    };
+    let x_end = if no.x_range.1 == xdim {
+        xdim
+    } else {
+        no.x_range.1 + 1
+    };
+    let mut gear_coords = Vec::new();
+
+    // Check top row
+    if no.y > 0 {
+        let y_top = no.y - 1;
+        for x in x_start..x_end {
+            if txtgrid[[y_top, x]] == '*' {
+                gear_coords.push((x, y_top));
+            }
+        }
+    }
+
+    // Check middle row
+    if no.x_range.0 > 0 && txtgrid[[no.y, no.x_range.0 - 1]] == '*' {
+        gear_coords.push((no.x_range.0 - 1, no.y));
+    }
+
+    if no.x_range.1 < xdim && txtgrid[[no.y, no.x_range.1]] == '*' {
+        gear_coords.push((no.x_range.1, no.y));
+    }
+
+    // Check bottom row
+    if no.y < ydim - 1 {
+        let y_bot = no.y + 1;
+        for x in x_start..x_end {
+            if txtgrid[[y_bot, x]] == '*' {
+                gear_coords.push((x, y_bot))
+            }
+        }
+    }
+
+    gear_coords
+}
+
+fn calculate_gear_ratio<T: Data<Elem = char>>(
+    numbers: &[EngNumber],
+    txtgrid: ArrayBase<T, Ix2>,
+) -> i32 {
+    let mut gearmap: HashMap<(usize, usize), Vec<i32>> = HashMap::new();
+    for no in numbers {
+        for gear in find_gears(no, txtgrid.view()) {
+            if let std::collections::hash_map::Entry::Vacant(e) = gearmap.entry(gear) {
+                e.insert(Vec::from([no.number]));
+            } else {
+                gearmap.get_mut(&gear).unwrap().push(no.number);
+            }
+        }
+    }
+
+    gearmap.values().map(|v| {
+        if v.len() == 2 {
+            v[0] * v[1]
+        } else {
+            0
+        }
+    }).sum()
 }

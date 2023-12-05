@@ -38,6 +38,10 @@ name = "aoc_day_4_2023"
 version = "0.1.0"
 
 [[package]]
+name = "aoc_day_5_2023"
+version = "0.1.0"
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
