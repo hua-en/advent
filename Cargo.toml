@@ -9,3 +9,4 @@ resolver = "2"
 
 [workspace.dependencies]
 regex = "1.10.2"
+ndarray = "0.15.6"
